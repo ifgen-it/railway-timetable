@@ -99,6 +99,15 @@
             <version>2.9.9</version>
         </dependency>
 
+        <!--        ACTIVE MQ -->
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.15.10</version>
+        </dependency>
+
+
     </dependencies>
 
 

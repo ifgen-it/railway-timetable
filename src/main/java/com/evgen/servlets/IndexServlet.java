@@ -2,6 +2,7 @@ package com.evgen.servlets;
 
 import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
+import com.evgen.service.StationRESTService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
@@ -12,6 +13,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
 import javax.enterprise.inject.Model;
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,50 +22,41 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/index")
 public class IndexServlet extends HttpServlet {
+
+    @Inject
+    private StationRESTService stationRESTService;
+
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         System.out.println("----> IndexServlet doPost");
 
-        // GET LIST OF STATIONS BY REST -- NEED TO MOVE THIS CODE INTO BEAN
+        // INPUT PARAMETERS
+        String strStationId = request.getParameter("stationId");
+        System.out.println("String stationId = " + strStationId);
 
-        System.out.println("Rest-client started..");
-
-        ClientConfig clientConfig = new DefaultClientConfig();
-        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-
-        Client client = Client.create(clientConfig);
-        WebResource webResource = client.resource("http://localhost:8080/api/stations");
-
-        ClientResponse restResponse = webResource
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .get(ClientResponse.class);
-
-        System.out.println("restResponse = " + restResponse);
-
-        if (restResponse.getStatus() != 200){
-            throw new RuntimeException("Failed : HTTP error code : " +
-                    restResponse.getStatus());
+        // NEED TO SHOW TIMETABLE
+        if (strStationId != null) {
+            int stationId = Integer.parseInt(strStationId);
+            response.sendRedirect("timetable?stationId=" + stationId);
         }
 
-        String output = restResponse.getEntity(String.class);
-        System.out.println("\nString output = " + output);
+        // GET LIST OF STATIONS BY REST
+        try {
+            List<StationSimpleDTO> stations = stationRESTService.getAllStations();
+            request.setAttribute("stations", stations);
+        } catch (Exception e) {
+            System.out.println("----> ERROR = " + e.getMessage());
+            e.printStackTrace();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<StationSimpleDTO> result = objectMapper.readValue(output,
-                new TypeReference<ArrayList<StationSimpleDTO>>(){});
-
-        System.out.println("\nResult = " + result);
-
-        // ADD PROPERTIES
-
-        request.setAttribute("stations", result);
-
+            request.setAttribute("connectionError", true);
+        }
 
         // REDIRECT
 
@@ -77,8 +70,6 @@ public class IndexServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         System.out.println("----> IndexServlet doGet");
-
-        request.setAttribute("server", "Trains-and-Rails Server");
 
         RequestDispatcher requestDispatcher = request
                 .getRequestDispatcher("/jsp/index.jsp");

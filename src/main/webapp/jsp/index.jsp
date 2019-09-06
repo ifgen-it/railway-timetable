@@ -14,19 +14,24 @@
     <header>Trains and Rails :: Timetable</header>
 
     <div id="content-index">
-        <div class="dark-text">Upload stations from ${server}</div>
+        <div class="dark-text">Load stations from Trains and Rails Server</div>
 
-        <form method="post">
-            <input type="submit" value="Upload">
+        <form action="index" method="post">
+            <input type="submit" value="Load">
         </form>
 
-        <c:if test="${stations == null}">
+        <c:if test="${stations == null && connectionError == null}">
             <div class="text-bad-news-small">Stations not loaded</div>
+        </c:if>
+
+        <c:if test="${stations == null && connectionError == true}">
+            <div class="text-bad-news-small">Server is not responding. Make sure that server is running</div>
         </c:if>
 
         <c:if test="${stations != null}">
             <div class="dark-text-small">Select station to display timetable:</div>
 
+            <form action="index" method="post">
             <div class="form-element">
                 <select name="stationId" class="form-element">
                     <c:forEach var="station" items="${stations}">
@@ -34,6 +39,9 @@
                     </c:forEach>
                 </select>
             </div>
+
+                <input type="submit" value="Show timetable">
+            </form>
 
         </c:if>
 
