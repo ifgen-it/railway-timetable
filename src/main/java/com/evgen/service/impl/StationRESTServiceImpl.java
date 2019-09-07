@@ -148,4 +148,17 @@ public class StationRESTServiceImpl implements StationRESTService {
         }
         return null;
     }
+
+    @Override
+    public StationSimpleDTO getStationByName(String stationName) throws IOException {
+
+        List<StationSimpleDTO> stations = getAllStations();
+
+        for ( StationSimpleDTO station : stations ) {
+            if (station.getStationName().equals(stationName)){
+                return station;
+            }
+        }
+        return null;
+    }
 }

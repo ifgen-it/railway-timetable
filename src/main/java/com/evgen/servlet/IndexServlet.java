@@ -1,18 +1,8 @@
-package com.evgen.servlets;
+package com.evgen.servlet;
 
-import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
 import com.evgen.service.StationRESTService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
-import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,10 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/index")

@@ -15,4 +15,6 @@ public interface StationRESTService {
     List<RoutePathSimpleDTO> getDepartures(int stationId) throws IOException;
 
     StationSimpleDTO getStation(int stationId) throws IOException;
+
+    StationSimpleDTO getStationByName(String stationName) throws IOException;
 }

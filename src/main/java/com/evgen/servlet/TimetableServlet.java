@@ -1,6 +1,6 @@
-package com.evgen.servlets;
+package com.evgen.servlet;
 
-import com.evgen.beans.MessageReceiver;
+import com.evgen.config.JMSConfig;
 import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
 import com.evgen.service.StationRESTService;
@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class TimetableServlet extends HttpServlet {
     private StationRESTService stationRESTService;
 
     @Inject
-    private MessageReceiver messageReceiver;
+    private JMSConfig jmsConfig;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -71,10 +72,12 @@ public class TimetableServlet extends HttpServlet {
 
                     StationSimpleDTO station = stationRESTService.getStation(stationId);
                     if (station != null) {
-                        request.setAttribute("stationName", station.getStationName());
+                        String stationName = station.getStationName();
+                        request.setAttribute("stationName", stationName);
 
                         // RUN TOPIC LISTENER
-                        messageReceiver.startListen(station.getStationName());
+                        jmsConfig.startListen(stationName);
+                        System.out.println("---> jmsConfig - startListen station : " + stationName);
 
                     } else {
                         request.setAttribute("stationName", "Unknown station");
