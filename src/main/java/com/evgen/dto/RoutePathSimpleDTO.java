@@ -13,12 +13,12 @@ public class RoutePathSimpleDTO implements Serializable {
 
     private int routePathId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime departureTime;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime arrivalTime;
@@ -31,10 +31,12 @@ public class RoutePathSimpleDTO implements Serializable {
 
     private String trainName;
 
+    private boolean isArrival;
+
     public RoutePathSimpleDTO() {
     }
 
-    public RoutePathSimpleDTO(int routePathId, LocalDateTime departureTime, LocalDateTime arrivalTime, int routeId, String routeName, int trainId, String trainName) {
+    public RoutePathSimpleDTO(int routePathId, LocalDateTime departureTime, LocalDateTime arrivalTime, int routeId, String routeName, int trainId, String trainName, boolean isArrival) {
         this.routePathId = routePathId;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
@@ -42,7 +44,9 @@ public class RoutePathSimpleDTO implements Serializable {
         this.routeName = routeName;
         this.trainId = trainId;
         this.trainName = trainName;
+        this.isArrival = isArrival;
     }
+
 
     public int getRoutePathId() {
         return routePathId;
@@ -111,5 +115,13 @@ public class RoutePathSimpleDTO implements Serializable {
                 ", trainId=" + trainId +
                 ", trainName='" + trainName + '\'' +
                 '}';
+    }
+
+    public boolean getIsArrival() {
+        return isArrival;
+    }
+
+    public void setIsArrival(boolean isArrival) {
+        this.isArrival = isArrival;
     }
 }

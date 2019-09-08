@@ -1,6 +1,12 @@
-package com.evgen.config;
+package com.evgen.listener;
 
+import com.evgen.config.JMSConfig;
+import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
+import com.evgen.service.StationRESTService;
+import com.evgen.websocket.TimetableWebsocket;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -11,6 +17,7 @@ import java.util.List;
 public class TopicMessageListener implements MessageListener {
 
     private JMSConfig jmsConfig;
+
 
     public TopicMessageListener(JMSConfig jmsConfig) {
         this.jmsConfig = jmsConfig;
@@ -32,13 +39,22 @@ public class TopicMessageListener implements MessageListener {
             // HANDLERS
             System.out.println("---> REST handlers:");
             try {
-                System.out.println("stationRestService: " + jmsConfig.getStationRESTService());
-                System.out.println("stationRestService hash: " + jmsConfig.getStationRESTService().hashCode());
+                StationRESTService stationRESTService = jmsConfig.getStationRESTService();
+                StationSimpleDTO station = stationRESTService.getStationByName(city);
 
-                List<StationSimpleDTO> stations = jmsConfig.getStationRESTService().getAllStations();
-                System.out.println("Stations by Rest: " + stations);
+                List<RoutePathSimpleDTO> arrivals = stationRESTService.getArrivals(station.getStationId());
+                List<RoutePathSimpleDTO> departures = stationRESTService.getDepartures(station.getStationId());
 
+                // UPDATE GUI
+                System.out.println("--> UPDATE GUI");
+                TimetableWebsocket tws = jmsConfig.getTimetableWebsocket();
 
+                ObjectMapper mapper = new ObjectMapper();
+                String strArrivals = mapper.writeValueAsString(arrivals);
+                String strDepartures = mapper.writeValueAsString(departures);
+
+                tws.sendMessageToBrowser(strArrivals);
+                tws.sendMessageToBrowser(strDepartures);
 
 
             } catch (IOException e) {

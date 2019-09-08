@@ -1,7 +1,8 @@
 package com.evgen.config;
 
+import com.evgen.listener.TopicMessageListener;
 import com.evgen.service.StationRESTService;
-import com.evgen.servlet.TimetableServlet;
+import com.evgen.websocket.TimetableWebsocket;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.annotation.PreDestroy;
@@ -21,6 +22,9 @@ public class JMSConfig {
 
     @Inject
     private StationRESTService stationRESTService;
+
+    @Inject
+    private TimetableWebsocket timetableWebsocket;
 
     public JMSConfig() {
     }
@@ -72,6 +76,8 @@ public class JMSConfig {
         return stationRESTService;
     }
 
-
+    public TimetableWebsocket getTimetableWebsocket() {
+        return timetableWebsocket;
+    }
 
 }
