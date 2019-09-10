@@ -18,6 +18,8 @@ import java.util.List;
 @ApplicationScoped
 public class TimetableBean implements Serializable {
 
+    private int stationId;
+
     private String stationName;
 
     private List<RoutePathSimpleDTO> arrivals;
@@ -29,11 +31,28 @@ public class TimetableBean implements Serializable {
 
 
     public TimetableBean() {
+        System.out.println("---> TimetableBean constructor");
     }
 
     public void init(int stationId){
+        System.out.println("---> Timetable INIT, stationId = " + stationId);
         try {
             StationSimpleDTO station = stationRESTService.getStation(stationId);
+            this.stationId = stationId;
+            this.stationName = station.getStationName();
+            this.arrivals = stationRESTService.getArrivals(stationId);
+            this.departures = stationRESTService.getDepartures(stationId);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void update(){
+        System.out.println("---> Timetable UPDATE");
+        try {
+            StationSimpleDTO station = stationRESTService.getStation(stationId);
+
             this.stationName = station.getStationName();
             this.arrivals = stationRESTService.getArrivals(stationId);
             this.departures = stationRESTService.getDepartures(stationId);
@@ -44,6 +63,14 @@ public class TimetableBean implements Serializable {
     }
 
     public String getStationName() {
+
+//        StationSimpleDTO station = null;
+//        try {
+//            station = stationRESTService.getStation(stationId);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return station.getStationName();
         return stationName;
     }
 
@@ -52,6 +79,13 @@ public class TimetableBean implements Serializable {
     }
 
     public List<RoutePathSimpleDTO> getArrivals() {
+
+//        try {
+//            this.arrivals = stationRESTService.getArrivals(stationId);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         return arrivals;
     }
 
@@ -60,10 +94,24 @@ public class TimetableBean implements Serializable {
     }
 
     public List<RoutePathSimpleDTO> getDepartures() {
+//        try {
+//            this.departures = stationRESTService.getDepartures(stationId);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         return departures;
     }
 
     public void setDepartures(List<RoutePathSimpleDTO> departures) {
         this.departures = departures;
+    }
+
+    public int getStationId() {
+        return stationId;
+    }
+
+    public void setStationId(int stationId) {
+        this.stationId = stationId;
     }
 }

@@ -31,7 +31,7 @@ public class IndexServlet extends HttpServlet {
         // NEED TO SHOW TIMETABLE
         if (strStationId != null) {
             int stationId = Integer.parseInt(strStationId);
-            response.sendRedirect("timetable?stationId=" + stationId);
+            response.sendRedirect("time-table?stationId=" + stationId);
         }
 
         // GET LIST OF STATIONS BY REST

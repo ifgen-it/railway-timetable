@@ -17,6 +17,15 @@ html,body{
     color: indigo;
 }
 
+#header{
+    height: 84px;
+    background-color: darkslateblue;
+    font-size: 32pt;
+    color: #f63;
+    text-align: center;
+    padding-top: 20px;
+}
+
 header{
     height: 84px;
     background-color: darkslateblue;

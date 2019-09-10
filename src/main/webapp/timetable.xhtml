@@ -11,14 +11,72 @@
 
     <h:head>
         <title>Railway Timetable</title>
+        <h:outputStylesheet library="css" name="style.css"/>
+        <link rel="shortcut icon" type="image/x-icon" href="#{resource['img/favicon.ico']}"/>
     </h:head>
 
     <h:body>
 
+        <div class="wrapper">
 
-        <h:outputLabel value="Timetable::StationName"/>
+            <div id="content-table-timetable">
+
+                <!--                TESTING -->
+
+                #{timetableBean.update()}
+
+                <div class="dark-text">Timetable :: ${timetableBean.stationName}</div>
+                <div class="dark-text">Timetable :: ${timetableBean.stationId}</div>
 
 
+                <table id="table-ws-timetable-arr-dep">
+                    <tr>
+                        <th>ARRIVAL</th>
+                        <th>DEPARTURE</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- ARRIVALS -->
+                            <table id="table-ws-timetable-arrival" border="2">
+                                <tr>
+                                    <th>Arrival time</th>
+                                    <th>Route</th>
+                                    <th>Train</th>
+                                </tr>
+                                <ui:repeat value="${timetableBean.arrivals}" var="arrival">
+                                    <tr>
+                                        <td>${arrival.arrivalTime}</td>
+                                        <td>${arrival.routeName}</td>
+                                        <td>${arrival.trainName}</td>
+                                    </tr>
+                                </ui:repeat>
+
+                            </table>
+                        </td>
+                        <td>
+                            <!-- DEPARTURES -->
+                            <table id="table-ws-timetable-departure" border="2">
+                                <tr>
+                                    <th>Departure time</th>
+                                    <th>Route</th>
+                                    <th>Train</th>
+                                </tr>
+
+                                <ui:repeat value="${timetableBean.departures}" var="departure">
+                                    <tr>
+                                        <td>${departure.departureTime}</td>
+                                        <td>${departure.routeName}</td>
+                                        <td>${departure.trainName}</td>
+                                    </tr>
+                                </ui:repeat>
+
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
     </h:body>
 </f:view>
 </html>
