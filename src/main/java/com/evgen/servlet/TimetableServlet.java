@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-@WebServlet("/timetable")
+@WebServlet("/time-table")
 public class TimetableServlet extends HttpServlet {
 
     @Inject
@@ -92,7 +92,7 @@ public class TimetableServlet extends HttpServlet {
 
         request.setAttribute("stationIdError", stationIdError);
 
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/timetable.jsp");
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/time_table.jsp");
         requestDispatcher.forward(request, response);
     }
 }

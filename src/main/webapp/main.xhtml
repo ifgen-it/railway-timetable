@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+
+<f:view>
+
+    <h:head>
+        <title>Railway Timetable</title>
+    </h:head>
+
+    <h:body>
+
+        <h:outputLabel value="Trains and Rails::Timetable"/>
+
+        <h:outputLabel value="Load stations from Trains and Rails Server"/>
+
+        <h:commandButton  value="Load"/>
+
+        <h:outputLabel id="loadedStations" value="Stations not loaded"/>
+
+        <h:outputLabel value="stations = #{stationsBean.stations}"/>
+
+        #{timetableBean.init(1)}
+        <h:outputLabel value="Station name = #{timetableBean.stationName}"/>
+        <h:outputLabel value="Arrivals = #{timetableBean.arrivals}"/>
+        <h:outputLabel value="Departures = #{timetableBean.departures}"/>
+
+        <h:form id="form">
+
+
+            <h:selectOneListbox>
+
+            </h:selectOneListbox>
+
+        </h:form>
+
+    </h:body>
+
+
+</f:view>
+
+</html>
