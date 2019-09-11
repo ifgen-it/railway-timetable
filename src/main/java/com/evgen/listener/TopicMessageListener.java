@@ -1,8 +1,10 @@
 package com.evgen.listener;
 
+import com.evgen.bean.TimetableBean;
 import com.evgen.config.JMSConfig;
 import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
+import com.evgen.dto.TimetableDTO;
 import com.evgen.service.StationRESTService;
 import com.evgen.websocket.TimetableWebsocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,20 +43,29 @@ public class TopicMessageListener implements MessageListener {
             try {
                 StationRESTService stationRESTService = jmsConfig.getStationRESTService();
                 StationSimpleDTO station = stationRESTService.getStationByName(city);
-
                 List<RoutePathSimpleDTO> arrivals = stationRESTService.getArrivals(station.getStationId());
                 List<RoutePathSimpleDTO> departures = stationRESTService.getDepartures(station.getStationId());
+
+                TimetableDTO timetableDTO = new TimetableDTO();
+                timetableDTO.setStation(station);
+                timetableDTO.setArrivals(arrivals);
+                timetableDTO.setDepartures(departures);
 
                 // UPDATE GUI
                 System.out.println("--> UPDATE GUI");
                 TimetableWebsocket tws = jmsConfig.getTimetableWebsocket();
 
                 ObjectMapper mapper = new ObjectMapper();
-                String strArrivals = mapper.writeValueAsString(arrivals);
-                String strDepartures = mapper.writeValueAsString(departures);
+                String strTimetable = mapper.writeValueAsString(timetableDTO);
+                System.out.println("---> Mapped object :" + strTimetable + "$");
 
-                tws.sendMessageToBrowser(strArrivals);
-                tws.sendMessageToBrowser(strDepartures);
+                tws.sendMessageToBrowser(strTimetable);
+
+                // UPDATE MANAGED BEAN
+                TimetableBean timetableBean = jmsConfig.getTimetableBean();
+                System.out.println("UPDATE timetableBean = " + timetableBean);
+                timetableBean.setArrivals(arrivals);
+                timetableBean.setDepartures(departures);
 
 
             } catch (IOException e) {

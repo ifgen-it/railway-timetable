@@ -3,9 +3,7 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:c="http://java.sun.com/jsp/jstl/core">
-
 
 <f:view>
 
@@ -19,85 +17,32 @@
     <h:body>
 
         <div class="wrapper">
-            <div id="header">Trains and Rails :: Timetable</div>
-
+            <div id="header">Trains and Rails::Timetable</div>
 
             <div id="content-index">
+                #{stationsBean.init()}
+                <c:if test="${stationsBean.connectionError == true}">
+                    <div class="dark-text">Timetable</div>
+                    <div class="text-bad-news">Server is not responding. Make sure that Trains and Rails server is running</div>
+                </c:if>
 
-                <div class="dark-text">Load stations from Trains and Rails Server</div>
+                <c:if test="${stationsBean.connectionError == false}">
+                    <div class="dark-text">Select station to display timetable</div>
 
-<!--                <h:outputLabel value="Trains and Rails::Timetable"/>-->
-
-<!--                <h:outputLabel value="Load stations from Trains and Rails Server"/>-->
-
-<!--                <h:commandButton value="Load"/>-->
-
-<!--                <h:outputLabel id="loadedStations" value="Stations not loaded"/>-->
-
-<!--                <h:outputLabel value="stations = #{stationsBean.stations}"/>-->
-
-<!--                #{timetableBean.init(1)}-->
-<!--                <h:outputLabel value="Station name = #{timetableBean.stationName}"/>-->
-<!--                <h:outputLabel value="Arrivals = #{timetableBean.arrivals}"/>-->
-<!--                <h:outputLabel value="Departures = #{timetableBean.departures}"/>-->
-
-<!--                <h:form id="form">-->
-
-<!--                    <h:panelGrid columns="1">-->
-<!--                        <h:commandLink action="TIMETABLE" value="Timetable page"/>-->
-<!--                        &lt;!&ndash;                <h:commandLink action="TIMETABLE_REDIRECT" value="Timetable redirect"/>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                <h:outputLink value="/timetable.xhtml">&ndash;&gt;-->
-<!--                        &lt;!&ndash;                    <h:outputText value="Timetable outputlink"/>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                </h:outputLink>&ndash;&gt;-->
-<!--                    </h:panelGrid>-->
-
-
-<!--                    <h:commandButton value="Save station">-->
-<!--                        <f:setPropertyActionListener target="#{timetableBean.init(2)}" value="2"/>-->
-<!--                    </h:commandButton>-->
-
-
-<!--                </h:form>-->
-
-                <!--                STATIONS -->
-                <ui:repeat value="#{stationsBean.stations}" var="station">
-                    <h:outputText value="#{station.stationName}"/><br/>
-                </ui:repeat>
-
-                #{timetableBean.init(1)}
-                <br/>
-                <h:form>
-                    <div class="form-element">
-                        <h:outputLabel value="Station Id" for="stationId"/>
-                        <h:inputText id="stationId" value="#{timetableBean.stationId}"/>
-                    </div>
-
-                    <div class="form-element">
-                        <h:outputLabel value="Station name" for="stationName"/>
-                        <h:inputText id="stationName" value="#{timetableBean.stationName}"/>
-                    </div>
-
-<!--                    <div class="form-element">-->
-<!--                        <h:selectOneMenu value="#{timetableBean.stationId}">-->
-
-<!--                            <f:selectItems value="#{stationsBean.stations}" var="station"-->
-<!--                                           itemLabel="#{station.stationName}" itemValue="#{station.stationId}"/>-->
-
-<!--                        </h:selectOneMenu>-->
-<!--                    </div>-->
-
-                    <h:commandButton value="Show timetable" action="TIMETABLE"/>
-
-                </h:form>
-
-                <h:outputText value="Timetable stationId = #{timetableBean.stationId}"/>
-
-
+                    <h:form>
+                        <div class="form-element">
+                            <h:selectOneMenu value="#{timetableBean.stationId}">
+                                <f:selectItems value="#{stationsBean.stations}" var="station"
+                                               itemLabel="#{station.stationName}" itemValue="#{station.stationId}"/>
+                            </h:selectOneMenu>
+                        </div>
+                        <h:commandButton value="Show timetable" action="timetable?faces-redirect=true"/>
+                    </h:form>
+                </c:if>
 
             </div>
         </div>
     </h:body>
-
 
 </f:view>
 

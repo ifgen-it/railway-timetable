@@ -1,16 +1,16 @@
 package com.evgen.bean;
 
+import com.evgen.config.JMSConfig;
 import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
+import com.evgen.dto.TimetableDTO;
 import com.evgen.service.StationRESTService;
+import com.evgen.websocket.TimetableWebsocket;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.SessionScoped;
-import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -26,51 +26,66 @@ public class TimetableBean implements Serializable {
 
     private List<RoutePathSimpleDTO> departures;
 
+    private boolean connectionError;
+
     @Inject
     private StationRESTService stationRESTService;
+
+    @Inject
+    private JMSConfig jmsConfig;
 
 
     public TimetableBean() {
         System.out.println("---> TimetableBean constructor");
     }
 
-    public void init(int stationId){
-        System.out.println("---> Timetable INIT, stationId = " + stationId);
+
+    public void init(){
+        System.out.println("---> Timetable INIT started");
         try {
+            if (stationId == 0){
+                System.out.println("StationId = 0, need to select station");
+                return;
+            }
             StationSimpleDTO station = stationRESTService.getStation(stationId);
-            this.stationId = stationId;
+
             this.stationName = station.getStationName();
             this.arrivals = stationRESTService.getArrivals(stationId);
             this.departures = stationRESTService.getDepartures(stationId);
+            this.connectionError = false;
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            // RUN TOPIC LISTENER
+            jmsConfig.startListen(stationName);
+            System.out.println("---> jmsConfig - startListen station : " + stationName);
+
+            // UPDATE GUI FOR RUNNING CLIENTS WITH OPENED TIMETABLE-PAGE
+            System.out.println("--> UPDATE GUI FOR RUNNING CLIENTS WITH OPENED TIMETABLE");
+            TimetableWebsocket tws = jmsConfig.getTimetableWebsocket();
+
+            TimetableDTO timetableDTO = new TimetableDTO();
+            timetableDTO.setStation(stationRESTService.getStation(stationId));
+            timetableDTO.setArrivals(arrivals);
+            timetableDTO.setDepartures(departures);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String strTimetable = mapper.writeValueAsString(timetableDTO);
+            tws.sendMessageToBrowser(strTimetable);
+
+            // AFTER END THIS METHOD WILL BE RENDER THIS CLIENT TIMETABLE-PAGE : TIMETABLE.XHTML
+
+        } catch (Exception e) {
+            System.out.println("---> Connection error, message = " + e.getMessage());
+            connectionError = true;
+            System.out.println("connection Error = " + connectionError);
         }
-    }
-
-    public void update(){
-        System.out.println("---> Timetable UPDATE");
-        try {
-            StationSimpleDTO station = stationRESTService.getStation(stationId);
-
-            this.stationName = station.getStationName();
-            this.arrivals = stationRESTService.getArrivals(stationId);
-            this.departures = stationRESTService.getDepartures(stationId);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (connectionError == false){
+            System.out.println("Timetable was loaded");
+        } else {
+            System.out.println("Timetable was not loaded");
         }
     }
 
     public String getStationName() {
-
-//        StationSimpleDTO station = null;
-//        try {
-//            station = stationRESTService.getStation(stationId);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return station.getStationName();
         return stationName;
     }
 
@@ -79,13 +94,6 @@ public class TimetableBean implements Serializable {
     }
 
     public List<RoutePathSimpleDTO> getArrivals() {
-
-//        try {
-//            this.arrivals = stationRESTService.getArrivals(stationId);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
         return arrivals;
     }
 
@@ -94,12 +102,6 @@ public class TimetableBean implements Serializable {
     }
 
     public List<RoutePathSimpleDTO> getDepartures() {
-//        try {
-//            this.departures = stationRESTService.getDepartures(stationId);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
         return departures;
     }
 
@@ -113,5 +115,13 @@ public class TimetableBean implements Serializable {
 
     public void setStationId(int stationId) {
         this.stationId = stationId;
+    }
+
+    public boolean isConnectionError() {
+        return connectionError;
+    }
+
+    public void setConnectionError(boolean connectionError) {
+        this.connectionError = connectionError;
     }
 }

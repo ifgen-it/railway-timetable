@@ -4,12 +4,16 @@ import javax.ejb.Singleton;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 @ServerEndpoint(value = "/websocket")
 public class TimetableWebsocket {
 
-    private Session session;
+    private static Set<Session> clients =
+            Collections.synchronizedSet(new HashSet<Session>());
 
 
     public TimetableWebsocket() {
@@ -17,8 +21,12 @@ public class TimetableWebsocket {
 
     public void sendMessageToBrowser(String message) {
         try {
-            session.getBasicRemote().sendText(message);
-            System.out.println("--> WS : send message to browser : " + message);
+            synchronized (clients){
+                for (Session client : clients){
+                    client.getBasicRemote().sendText(message);
+                }
+            }
+            System.out.println("--> WS : send message to browser :" + message);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -28,8 +36,10 @@ public class TimetableWebsocket {
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-        System.out.println("---> WS : new session opened");
-        this.session = session;
+        System.out.println("---> WS : new session opened, session = " + session + ", session id = " + session.getId());
+
+        clients.add(session);
+        System.out.println("Count of clients = " + clients.size());
     }
 
     // WAS USED FOR TESTING
@@ -59,7 +69,8 @@ public class TimetableWebsocket {
 
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
-        System.out.println("---> WS : Session closed: " + closeReason);
+        System.out.println("---> WS : Session : " + session + " - closed: " + closeReason);
+        clients.remove(session);
     }
 
 

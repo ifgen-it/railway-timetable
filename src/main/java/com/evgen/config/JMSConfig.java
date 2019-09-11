@@ -1,5 +1,6 @@
 package com.evgen.config;
 
+import com.evgen.bean.TimetableBean;
 import com.evgen.listener.TopicMessageListener;
 import com.evgen.service.StationRESTService;
 import com.evgen.websocket.TimetableWebsocket;
@@ -25,6 +26,9 @@ public class JMSConfig {
 
     @Inject
     private TimetableWebsocket timetableWebsocket;
+
+    @Inject
+    private TimetableBean timetableBean;
 
     public JMSConfig() {
     }
@@ -80,4 +84,11 @@ public class JMSConfig {
         return timetableWebsocket;
     }
 
+    public TimetableBean getTimetableBean() {
+        return timetableBean;
+    }
+
+    public void setTimetableBean(TimetableBean timetableBean) {
+        this.timetableBean = timetableBean;
+    }
 }
