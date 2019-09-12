@@ -2,6 +2,7 @@ package com.evgen.bean;
 
 import com.evgen.dto.StationSimpleDTO;
 import com.evgen.service.StationRESTService;
+import org.apache.log4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -16,6 +17,8 @@ import java.util.List;
 @ViewScoped
 public class StationsBean implements Serializable {
 
+    private static final Logger logger = Logger.getLogger(StationsBean.class);
+
     @Inject
     private StationRESTService stationRESTService;
 
@@ -24,29 +27,30 @@ public class StationsBean implements Serializable {
     private boolean connectionError;
 
     public StationsBean() {
-        System.out.println("---> StationsBean constructor");
+
+        logger.info("StationsBean constructor");
     }
 
     @PostConstruct
     public void init(){
-        System.out.println("---> StationsBean init");
+        logger.info("StationsBean init");
         try {
             this.stations = stationRESTService.getAllStations();
         } catch (Exception e) {
-            System.out.println("---> Connection error, message = " + e.getMessage());
+            logger.warn("Connection error, message = " + e.getMessage());
             connectionError = true;
         }
         if (connectionError == false){
-            System.out.println("Stations was initialized");
+            logger.info("Stations was initialized");
         } else {
-            System.out.println("Stations was not initialized");
+            logger.warn("Stations was not initialized");
         }
 
     }
 
     @PreDestroy
     public void destroy(){
-        System.out.println("---> StationsBean destroy");
+        logger.info("StationsBean destroy");
     }
 
 

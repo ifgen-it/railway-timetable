@@ -1,5 +1,7 @@
 package com.evgen.websocket;
 
+import org.apache.log4j.Logger;
+
 import javax.ejb.Singleton;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -11,6 +13,8 @@ import java.util.Set;
 @Singleton
 @ServerEndpoint(value = "/websocket")
 public class TimetableWebsocket {
+
+    private static final Logger logger = Logger.getLogger(TimetableWebsocket.class);
 
     private static Set<Session> clients =
             Collections.synchronizedSet(new HashSet<Session>());
@@ -26,9 +30,10 @@ public class TimetableWebsocket {
                     client.getBasicRemote().sendText(message);
                 }
             }
-            System.out.println("--> WS : send message to browser :" + message);
+            logger.info("send message to browser :" + message);
 
         } catch (IOException e) {
+            logger.warn("Exception : " + e);
             e.printStackTrace();
         }
     }
@@ -36,16 +41,16 @@ public class TimetableWebsocket {
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-        System.out.println("---> WS : new session opened, session = " + session + ", session id = " + session.getId());
+        logger.info("new session opened, session = " + session + ", session id = " + session.getId());
 
         clients.add(session);
-        System.out.println("Count of clients = " + clients.size());
+        logger.info("Count of clients = " + clients.size());
     }
 
     // WAS USED FOR TESTING
     @OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("---> WS : message received : " + message);
+        logger.info("message received : " + message);
 
         try {
             session.getBasicRemote().sendText("Hello, Browser!");
@@ -56,20 +61,22 @@ public class TimetableWebsocket {
             session.getBasicRemote().sendText("Good bye, Browser!");
 
         } catch (IOException e) {
+            logger.warn("Exception : " + e);
             e.printStackTrace();
         } catch (InterruptedException e) {
+            logger.warn("Exception : " + e);
             e.printStackTrace();
         }
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        System.out.println("---> WS : Error occurred: " + throwable.getMessage());
+        logger.warn("Error occurred: " + throwable.getMessage());
     }
 
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
-        System.out.println("---> WS : Session : " + session + " - closed: " + closeReason);
+        logger.warn("Session : " + session + " - closed: " + closeReason);
         clients.remove(session);
     }
 

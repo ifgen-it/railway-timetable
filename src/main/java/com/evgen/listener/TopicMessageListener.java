@@ -1,5 +1,6 @@
 package com.evgen.listener;
 
+import com.evgen.bean.StationsBean;
 import com.evgen.bean.TimetableBean;
 import com.evgen.config.JMSConfig;
 import com.evgen.dto.RoutePathSimpleDTO;
@@ -8,6 +9,7 @@ import com.evgen.dto.TimetableDTO;
 import com.evgen.service.StationRESTService;
 import com.evgen.websocket.TimetableWebsocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -17,6 +19,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class TopicMessageListener implements MessageListener {
+
+    private static final Logger logger = Logger.getLogger(TopicMessageListener.class);
 
     private JMSConfig jmsConfig;
 
@@ -30,16 +34,14 @@ public class TopicMessageListener implements MessageListener {
 
         TextMessage textMessage = (TextMessage) message;
         try {
-            System.out.println("---> onMessage method:");
-            System.out.println("Text from message: " + textMessage.getText());
-            String city = textMessage.getStringProperty("city");
-            System.out.println("Properties: city = " + city);
 
-            System.out.print("Message: ");
-            System.out.println(message);
+            logger.info("message: text: " + textMessage.getText());
+            String city = textMessage.getStringProperty("city");
+            logger.info("Properties: city = " + city);
+
+            logger.info("Message: " + message);
 
             // HANDLERS
-            System.out.println("---> REST handlers:");
             try {
                 StationRESTService stationRESTService = jmsConfig.getStationRESTService();
                 StationSimpleDTO station = stationRESTService.getStationByName(city);
@@ -52,18 +54,18 @@ public class TopicMessageListener implements MessageListener {
                 timetableDTO.setDepartures(departures);
 
                 // UPDATE GUI
-                System.out.println("--> UPDATE GUI");
+                logger.info("UPDATE GUI");
                 TimetableWebsocket tws = jmsConfig.getTimetableWebsocket();
 
                 ObjectMapper mapper = new ObjectMapper();
                 String strTimetable = mapper.writeValueAsString(timetableDTO);
-                System.out.println("---> Mapped object :" + strTimetable + "$");
+                logger.info("Mapped object :" + strTimetable);
 
                 tws.sendMessageToBrowser(strTimetable);
 
                 // UPDATE MANAGED BEAN
                 TimetableBean timetableBean = jmsConfig.getTimetableBean();
-                System.out.println("UPDATE timetableBean = " + timetableBean);
+                logger.info("UPDATE timetableBean = " + timetableBean);
                 timetableBean.setArrivals(arrivals);
                 timetableBean.setDepartures(departures);
 
@@ -74,7 +76,7 @@ public class TopicMessageListener implements MessageListener {
 
 
         } catch (JMSException e) {
-            System.out.println("--> Error in onMessage:");
+            logger.warn("Error in onMessage:");
             e.printStackTrace();
         }
     }

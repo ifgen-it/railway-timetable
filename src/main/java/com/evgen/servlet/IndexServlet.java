@@ -2,6 +2,7 @@ package com.evgen.servlet;
 
 import com.evgen.dto.StationSimpleDTO;
 import com.evgen.service.StationRESTService;
+import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -16,17 +17,17 @@ import java.util.List;
 @WebServlet("/index")
 public class IndexServlet extends HttpServlet {
 
+    private static final Logger logger = Logger.getLogger(IndexServlet.class);
+
     @Inject
     private StationRESTService stationRESTService;
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        System.out.println("----> IndexServlet doPost");
-
         // INPUT PARAMETERS
         String strStationId = request.getParameter("stationId");
-        System.out.println("String stationId = " + strStationId);
+        logger.info("String stationId = " + strStationId);
 
         // NEED TO SHOW TIMETABLE
         if (strStationId != null) {
@@ -39,7 +40,7 @@ public class IndexServlet extends HttpServlet {
             List<StationSimpleDTO> stations = stationRESTService.getAllStations();
             request.setAttribute("stations", stations);
         } catch (Exception e) {
-            System.out.println("----> ERROR = " + e.getMessage());
+            logger.warn("ERROR = " + e.getMessage());
             e.printStackTrace();
 
             request.setAttribute("connectionError", true);
@@ -56,7 +57,7 @@ public class IndexServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        System.out.println("----> IndexServlet doGet");
+        logger.info("IndexServlet");
 
         RequestDispatcher requestDispatcher = request
                 .getRequestDispatcher("/jsp/index.jsp");

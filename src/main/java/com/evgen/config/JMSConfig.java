@@ -1,10 +1,12 @@
 package com.evgen.config;
 
+import com.evgen.bean.StationsBean;
 import com.evgen.bean.TimetableBean;
 import com.evgen.listener.TopicMessageListener;
 import com.evgen.service.StationRESTService;
 import com.evgen.websocket.TimetableWebsocket;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.log4j.Logger;
 
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
@@ -14,6 +16,8 @@ import javax.jms.*;
 
 @Singleton
 public class JMSConfig {
+
+    private static final Logger logger = Logger.getLogger(JMSConfig.class);
 
     private TopicSubscriber subscriber;
     private TopicSession session;
@@ -35,7 +39,7 @@ public class JMSConfig {
 
     public void startListen(String stationName) throws JMSException {
 
-        System.out.println("---> JMSConfig started");
+        logger.info("JMSConfig started");
 
         if (isAlive == true){
             clean();
@@ -55,25 +59,25 @@ public class JMSConfig {
 
             subscriber.setMessageListener(topicMessageListener);
             connection.start();
-            System.out.println("Asynchronous Subscriber created, waiting for message...");
+            logger.info("Asynchronous Subscriber created, waiting for message...");
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            System.out.println("---> finally : JMSConfig");
+            logger.info("JMSConfig - work done");
             isAlive = true;
         }
     }
 
     @PreDestroy
     public void clean() throws JMSException {
-        System.out.println("---> JMSConfig Cleaning");
+        logger.info("JMSConfig Cleaning");
 
         subscriber.close();
         session.close();
         connection.close();
         isAlive = false;
-        System.out.println("---> clean : Resources closed");
+        logger.info("Resources closed");
     }
 
     public StationRESTService getStationRESTService(){

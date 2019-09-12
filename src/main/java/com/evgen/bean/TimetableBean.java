@@ -7,6 +7,7 @@ import com.evgen.dto.TimetableDTO;
 import com.evgen.service.StationRESTService;
 import com.evgen.websocket.TimetableWebsocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -17,6 +18,8 @@ import java.util.List;
 @Named
 @ApplicationScoped
 public class TimetableBean implements Serializable {
+
+    private static final Logger logger = Logger.getLogger(TimetableBean.class);
 
     private int stationId;
 
@@ -36,15 +39,15 @@ public class TimetableBean implements Serializable {
 
 
     public TimetableBean() {
-        System.out.println("---> TimetableBean constructor");
+        logger.info("TimetableBean constructor");
     }
 
 
     public void init(){
-        System.out.println("---> Timetable INIT started");
+        logger.info("Timetable INIT started");
         try {
             if (stationId == 0){
-                System.out.println("StationId = 0, need to select station");
+                logger.warn("StationId = 0, need to select station");
                 return;
             }
             StationSimpleDTO station = stationRESTService.getStation(stationId);
@@ -56,10 +59,10 @@ public class TimetableBean implements Serializable {
 
             // RUN TOPIC LISTENER
             jmsConfig.startListen(stationName);
-            System.out.println("---> jmsConfig - startListen station : " + stationName);
+            logger.info("jmsConfig - startListen station : " + stationName);
 
             // UPDATE GUI FOR RUNNING CLIENTS WITH OPENED TIMETABLE-PAGE
-            System.out.println("--> UPDATE GUI FOR RUNNING CLIENTS WITH OPENED TIMETABLE");
+            logger.info("UPDATE GUI FOR RUNNING CLIENTS WITH OPENED TIMETABLE");
             TimetableWebsocket tws = jmsConfig.getTimetableWebsocket();
 
             TimetableDTO timetableDTO = new TimetableDTO();
@@ -74,14 +77,13 @@ public class TimetableBean implements Serializable {
             // AFTER END THIS METHOD WILL BE RENDER THIS CLIENT TIMETABLE-PAGE : TIMETABLE.XHTML
 
         } catch (Exception e) {
-            System.out.println("---> Connection error, message = " + e.getMessage());
+            logger.warn("Connection error, message = " + e.getMessage());
             connectionError = true;
-            System.out.println("connection Error = " + connectionError);
         }
         if (connectionError == false){
-            System.out.println("Timetable was loaded");
+            logger.info("Timetable was loaded");
         } else {
-            System.out.println("Timetable was not loaded");
+            logger.warn("Timetable was not loaded");
         }
     }
 

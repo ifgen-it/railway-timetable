@@ -4,6 +4,7 @@ import com.evgen.config.JMSConfig;
 import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
 import com.evgen.service.StationRESTService;
+import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -18,6 +19,8 @@ import java.util.List;
 
 @WebServlet("/time-table")
 public class TimetableServlet extends HttpServlet {
+
+    private static final Logger logger = Logger.getLogger(TimetableServlet.class);
 
     @Inject
     private StationRESTService stationRESTService;
@@ -34,11 +37,9 @@ public class TimetableServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        System.out.println("====> Timetable servlet DO GET");
-
         // INPUT PARAMETERS
         String strStationId = request.getParameter("stationId");
-        System.out.println("String stationId = " + strStationId);
+        logger.info("String stationId = " + strStationId);
 
         boolean stationIdError = false;
 
@@ -49,7 +50,7 @@ public class TimetableServlet extends HttpServlet {
             try {
                 stationId = Integer.parseInt(strStationId);
             } catch (NumberFormatException e) {
-                System.out.println("---> stationId parse Error");
+                logger.warn("stationId parse Error");
                 stationIdError = true;
             }
 
@@ -76,13 +77,13 @@ public class TimetableServlet extends HttpServlet {
 
                         // RUN TOPIC LISTENER
                         jmsConfig.startListen(stationName);
-                        System.out.println("---> jmsConfig - startListen station : " + stationName);
+                        logger.info("jmsConfig - startListen station : " + stationName);
 
                     } else {
                         request.setAttribute("stationName", "Unknown station");
                     }
                 } catch (Exception e){
-                    System.out.println("----> ERROR = " + e.getMessage());
+                    logger.warn("ERROR = " + e.getMessage());
                     e.printStackTrace();
 
                     request.setAttribute("connectionError", true);

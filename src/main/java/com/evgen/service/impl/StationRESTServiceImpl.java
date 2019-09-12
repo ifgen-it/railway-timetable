@@ -1,5 +1,6 @@
 package com.evgen.service.impl;
 
+import com.evgen.bean.StationsBean;
 import com.evgen.dto.RoutePathSimpleDTO;
 import com.evgen.dto.StationSimpleDTO;
 import com.evgen.service.StationRESTService;
@@ -11,9 +12,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import org.apache.log4j.Logger;
 
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
 import javax.ejb.Stateless;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -23,13 +23,15 @@ import java.util.List;
 @Stateless
 public class StationRESTServiceImpl implements StationRESTService {
 
+    private static final Logger logger = Logger.getLogger(StationRESTServiceImpl.class);
+
 
     @Override
     public List<StationSimpleDTO> getAllStations() throws IOException {
 
-        // GET LIST OF STATIONS BY REST -- NEED TO MOVE THIS CODE INTO BEAN
+        // GET LIST OF STATIONS BY REST
 
-        System.out.println("Rest-client started..");
+        logger.info("Rest-client started..");
 
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -42,7 +44,7 @@ public class StationRESTServiceImpl implements StationRESTService {
                 .type(MediaType.APPLICATION_JSON)
                 .get(ClientResponse.class);
 
-        System.out.println("restResponse = " + restResponse);
+        logger.info("restResponse = " + restResponse);
 
         if (restResponse.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : " +
@@ -50,14 +52,14 @@ public class StationRESTServiceImpl implements StationRESTService {
         }
 
         String output = restResponse.getEntity(String.class);
-        System.out.println("\nString output = " + output);
+        logger.info("String output = " + output);
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<StationSimpleDTO> result = objectMapper.readValue(output,
                 new TypeReference<ArrayList<StationSimpleDTO>>() {
                 });
 
-        System.out.println("\nResult = " + result);
+        logger.info("Result = " + result);
 
         return result;
     }
@@ -65,7 +67,7 @@ public class StationRESTServiceImpl implements StationRESTService {
     @Override
     public List<RoutePathSimpleDTO> getArrivals(int stationId) throws IOException {
 
-        System.out.println("Rest-client started..");
+        logger.info("Rest-client started..");
 
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -78,7 +80,7 @@ public class StationRESTServiceImpl implements StationRESTService {
                 .type(MediaType.APPLICATION_JSON)
                 .get(ClientResponse.class);
 
-        System.out.println("response : Arrivals = " + response);
+        logger.info("response : Arrivals = " + response);
 
         if (response.getStatus() != 200){
             throw new RuntimeException("Failed : HTTP error code : " +
@@ -86,7 +88,7 @@ public class StationRESTServiceImpl implements StationRESTService {
         }
 
         String output = response.getEntity(String.class);
-        System.out.println("\nString output = " + output);
+        logger.info("String output = " + output);
         if (output.equals("")){
             return null;
         }
@@ -95,7 +97,7 @@ public class StationRESTServiceImpl implements StationRESTService {
         List<RoutePathSimpleDTO> result = objectMapper.readValue(output,
                 new TypeReference<ArrayList<RoutePathSimpleDTO>>(){});
 
-        System.out.println("\nResult = " + result);
+        logger.info("Result = " + result);
 
         return result;
     }
@@ -103,7 +105,7 @@ public class StationRESTServiceImpl implements StationRESTService {
     @Override
     public List<RoutePathSimpleDTO> getDepartures(int stationId) throws IOException {
 
-        System.out.println("Rest-client started..");
+        logger.info("Rest-client started..");
 
         ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -116,7 +118,7 @@ public class StationRESTServiceImpl implements StationRESTService {
                 .type(MediaType.APPLICATION_JSON)
                 .get(ClientResponse.class);
 
-        System.out.println("response : Departures = " + response);
+        logger.info("response : Departures = " + response);
 
         if (response.getStatus() != 200){
             throw new RuntimeException("Failed : HTTP error code : " +
@@ -124,7 +126,7 @@ public class StationRESTServiceImpl implements StationRESTService {
         }
 
         String output = response.getEntity(String.class);
-        System.out.println("\nString output = " + output);
+        logger.info("String output = " + output);
         if (output.equals("")){
             return null;
         }
@@ -133,7 +135,7 @@ public class StationRESTServiceImpl implements StationRESTService {
         List<RoutePathSimpleDTO> result = objectMapper.readValue(output,
                 new TypeReference<ArrayList<RoutePathSimpleDTO>>(){});
 
-        System.out.println("\nResult = " + result);
+        logger.info("Result = " + result);
 
         return result;
     }
