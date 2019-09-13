@@ -1,8 +1,15 @@
 package com.evgen.websocket;
 
+import com.evgen.bean.TimetableBean;
+import com.evgen.dto.StationSimpleDTO;
+import com.evgen.dto.TimetableDTO;
+import com.evgen.service.StationRESTService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
 import javax.ejb.Singleton;
+import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -13,6 +20,12 @@ import java.util.Set;
 @Singleton
 @ServerEndpoint(value = "/websocket")
 public class TimetableWebsocket {
+
+    @Inject
+    private TimetableBean timetableBean;
+
+    @Inject
+    private StationRESTService stationRESTService;
 
     private static final Logger logger = Logger.getLogger(TimetableWebsocket.class);
 
@@ -25,8 +38,8 @@ public class TimetableWebsocket {
 
     public void sendMessageToBrowser(String message) {
         try {
-            synchronized (clients){
-                for (Session client : clients){
+            synchronized (clients) {
+                for (Session client : clients) {
                     client.getBasicRemote().sendText(message);
                 }
             }
@@ -45,6 +58,31 @@ public class TimetableWebsocket {
 
         clients.add(session);
         logger.info("Count of clients = " + clients.size());
+
+        // UPDATE GUI
+        try {
+            StationSimpleDTO stationSimpleDTO = stationRESTService.getStation(timetableBean.getStationId());
+
+            TimetableDTO timetableDTO = new TimetableDTO();
+            timetableDTO.setStation(stationSimpleDTO);
+            timetableDTO.setArrivals(timetableBean.getArrivals());
+            timetableDTO.setDepartures(timetableBean.getDepartures());
+
+            ObjectMapper mapper = new ObjectMapper();
+            String strTimetable = null;
+
+            strTimetable = mapper.writeValueAsString(timetableDTO);
+
+            logger.info("Mapped object :" + strTimetable);
+
+            this.sendMessageToBrowser(strTimetable);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     // WAS USED FOR TESTING
